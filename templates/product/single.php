@@ -34,7 +34,10 @@ $first_image = $images[0] ?? '';
 			<select id="wordpify-variant-select-<?php echo esc_attr( $product->ID ); ?>" class="wordpify-variant-select">
 				<?php foreach ( $variants as $v ) : ?>
 				<option value="<?php echo esc_attr( $v['id'] ); ?>" <?php echo $v['available'] ? '' : 'disabled'; ?>>
-					<?php echo esc_html( $v['title'] . ' — ' . $v['price'] . ' ' . $v['currency_code'] ); ?>
+					<?php
+					$v_title = ( ! empty( $v['title'] ) && $v['title'] !== 'Default Title' ) ? $v['title'] . ' — ' : '';
+					echo esc_html( $v_title . $v['price'] . ' ' . $v['currency_code'] );
+					?>
 				</option>
 				<?php endforeach; ?>
 			</select>

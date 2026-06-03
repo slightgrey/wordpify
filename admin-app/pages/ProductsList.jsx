@@ -2,8 +2,31 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
+
+function CopyShortcode({ id }) {
+  const [copied, setCopied] = useState(false);
+  const tag = `[wordpify_product id="${id}"]`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(tag).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      title="Copy shortcode"
+      className="flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-mono text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+    >
+      {copied ? <Check className="h-3 w-3 text-green-600 shrink-0" /> : <Copy className="h-3 w-3 shrink-0" />}
+      {copied ? 'Copied!' : tag}
+    </button>
+  );
+}
 
 export default function ProductsList() {
   const [page, setPage] = useState(1);
@@ -34,6 +57,7 @@ export default function ProductsList() {
                   <th className="text-left px-4 py-3 font-medium">Handle</th>
                   <th className="text-left px-4 py-3 font-medium">Variants</th>
                   <th className="text-left px-4 py-3 font-medium">Last Synced</th>
+                  <th className="text-left px-4 py-3 font-medium">Shortcode</th>
                 </tr>
               </thead>
               <tbody>
@@ -44,7 +68,10 @@ export default function ProductsList() {
                         {p.image_url && (
                           <img src={p.image_url} alt={p.title} className="h-10 w-10 rounded object-cover border" />
                         )}
-                        <span className="font-medium">{p.title}</span>
+                        <div>
+                          <span className="font-medium">{p.title}</span>
+                          <p className="text-xs text-muted-foreground">ID: {p.id}</p>
+                        </div>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-muted-foreground font-mono text-xs">{p.handle}</td>
@@ -53,6 +80,9 @@ export default function ProductsList() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-xs">
                       {p.synced_at ? new Date(p.synced_at).toLocaleString() : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <CopyShortcode id={p.id} />
                     </td>
                   </tr>
                 ))}

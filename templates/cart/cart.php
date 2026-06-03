@@ -26,7 +26,10 @@ $total = $cart['cost']['totalAmount'] ?? [];
 			<?php endif; ?>
 			<div class="wordpify-cart-item__details">
 				<p class="wordpify-cart-item__name"><?php echo esc_html( $product['title'] ?? '' ); ?></p>
-				<p class="wordpify-cart-item__variant"><?php echo esc_html( $merch['title'] ?? '' ); ?></p>
+				<?php $variant_title = $merch['title'] ?? ''; ?>
+				<?php if ( $variant_title && $variant_title !== 'Default Title' ) : ?>
+				<p class="wordpify-cart-item__variant"><?php echo esc_html( $variant_title ); ?></p>
+				<?php endif; ?>
 				<p class="wordpify-cart-item__price">
 					<?php echo esc_html( ( $merch['price']['amount'] ?? '' ) . ' ' . ( $merch['price']['currencyCode'] ?? '' ) ); ?>
 				</p>
