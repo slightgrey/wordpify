@@ -1,0 +1,27 @@
+# JS dependencies
+node_modules/
+
+# PHP dependencies (regenerate with: composer install)
+vendor/
+
+# Built assets (regenerate with: npm run build)
+dist/
+
+# Distribution zips
+*.zip
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs & env
+*.log
+.env
+.env.*
+!.env.example
