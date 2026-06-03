@@ -1,18 +1,12 @@
 <?php
 /**
- * Template: Checkout (iframe)
+ * Template: Checkout redirect
  */
 defined( 'ABSPATH' ) || exit;
 ?>
-<div class="wordpify-checkout-wrap" id="wordpify-checkout-wrap">
-	<p class="wordpify-checkout-wrap__loading" id="wordpify-checkout-loading">
-		<?php esc_html_e( 'Loading checkout…', 'wordpify' ); ?>
+<div class="wordpify-checkout-redirect" id="wordpify-checkout-redirect">
+	<div class="wordpify-checkout-redirect__spinner"></div>
+	<p class="wordpify-checkout-redirect__msg">
+		<?php esc_html_e( 'Preparing your checkout…', 'wordpify' ); ?>
 	</p>
-	<iframe
-		id="wordpify-checkout-iframe"
-		class="wordpify-checkout-iframe"
-		allow="payment"
-		style="display:none"
-		title="<?php esc_attr_e( 'Checkout', 'wordpify' ); ?>"
-	></iframe>
 </div>

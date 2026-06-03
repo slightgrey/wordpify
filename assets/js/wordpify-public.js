@@ -235,33 +235,20 @@
     });
   }
 
-  // --- Checkout iframe ---
-  const checkoutIframe = document.getElementById('wordpify-checkout-iframe');
-  if (checkoutIframe) {
+  // --- Checkout redirect ---
+  const checkoutRedirect = document.getElementById('wordpify-checkout-redirect');
+  if (checkoutRedirect) {
     api('/cart/checkout').then(data => {
-      // Empty or missing cart — send back to cart page
       if (!data.checkout_url || !data.total_quantity) {
         window.location.replace(cartUrl);
         return;
       }
-
-      const loading = document.getElementById('wordpify-checkout-loading');
-
-      checkoutIframe.addEventListener('load', () => {
-        checkoutIframe.style.display = 'block';
-        loading?.remove();
-      });
-
-      checkoutIframe.src = data.checkout_url;
-
-      // Fallback: if Shopify blocks the iframe after 4s, redirect instead
       setTimeout(() => {
-        if (checkoutIframe.style.display === 'none') {
-          window.location.href = data.checkout_url;
-        }
-      }, 4000);
+        window.location.href = data.checkout_url;
+      }, 300);
     }).catch(() => {
       showToast('Could not load checkout.', 'error');
+      setTimeout(() => window.location.replace(cartUrl), 1500);
     });
   }
 
