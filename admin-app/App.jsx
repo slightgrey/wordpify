@@ -26,7 +26,10 @@ function Sidebar() {
       <div className="px-4 py-5 border-b">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">W</div>
-          <span className="font-semibold text-sm">Wordpify</span>
+          <div>
+            <div className="font-semibold text-sm leading-tight">Wordpify</div>
+            <div className="text-[10px] text-muted-foreground leading-tight">by Web of D</div>
+          </div>
         </div>
       </div>
       <nav className="flex-1 p-2 space-y-0.5">
