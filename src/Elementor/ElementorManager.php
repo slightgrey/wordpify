@@ -7,6 +7,7 @@ namespace Wordpify\Elementor;
 use Wordpify\Elementor\Widgets\AccountAddressWidget;
 use Wordpify\Elementor\Widgets\AccountDetailsWidget;
 use Wordpify\Elementor\Widgets\CartWidget;
+use Wordpify\Elementor\Widgets\CheckoutWidget;
 use Wordpify\Elementor\Widgets\MiniCartWidget;
 use Wordpify\Elementor\Widgets\OrderHistoryWidget;
 use Wordpify\Elementor\Widgets\ProductGridWidget;
@@ -30,6 +31,7 @@ class ElementorManager {
 			OrderHistoryWidget::class,
 			CartWidget::class,
 			MiniCartWidget::class,
+			CheckoutWidget::class,
 		];
 
 		foreach ( $widgets as $widget_class ) {

@@ -35,6 +35,7 @@ class PublicAssets {
 			'restUrl' => rest_url(),
 			'cartId'  => $cart_id,
 			'userId'  => $user_id,
+			'cartUrl' => home_url( '/cart/' ),
 		] );
 	}
 }

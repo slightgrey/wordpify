@@ -149,6 +149,11 @@
   flex-shrink: 0;
 }
 
+/* ── Checkout iframe ── */
+.wordpify-checkout-wrap { min-height: 600px; }
+.wordpify-checkout-wrap__loading { color: #6b7280; font-size: 0.875rem; }
+.wordpify-checkout-iframe { width: 100%; min-height: 800px; border: none; display: block; }
+
 /* ── Toast notification ── */
 .wordpify-toast {
   position: fixed;

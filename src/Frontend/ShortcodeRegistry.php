@@ -7,6 +7,7 @@ namespace Wordpify\Frontend;
 use Wordpify\Frontend\Shortcodes\AccountAddressShortcode;
 use Wordpify\Frontend\Shortcodes\AccountDetailsShortcode;
 use Wordpify\Frontend\Shortcodes\CartShortcode;
+use Wordpify\Frontend\Shortcodes\CheckoutShortcode;
 use Wordpify\Frontend\Shortcodes\MiniCartShortcode;
 use Wordpify\Frontend\Shortcodes\OrderHistoryShortcode;
 use Wordpify\Frontend\Shortcodes\ProductGridShortcode;
@@ -22,5 +23,7 @@ class ShortcodeRegistry {
 		add_shortcode( 'wordpify_orders',    [ OrderHistoryShortcode::class,   'render' ] );
 		add_shortcode( 'wordpify_cart',      [ CartShortcode::class,           'render' ] );
 		add_shortcode( 'wordpify_mini_cart', [ MiniCartShortcode::class,       'render' ] );
+		add_shortcode( 'wordpify_checkout',  [ CheckoutShortcode::class,       'render' ] );
+		CheckoutShortcode::guard();
 	}
 }

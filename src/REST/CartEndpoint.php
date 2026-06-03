@@ -135,8 +135,11 @@ class CartEndpoint {
 	public static function checkout( WP_REST_Request $_request ): WP_REST_Response {
 		try {
 			$manager = new CartManager();
-			$url     = $manager->get_checkout_url( get_current_user_id() );
-			return new WP_REST_Response( [ 'checkout_url' => $url ], 200 );
+			$cart    = $manager->get_or_create( get_current_user_id() );
+			return new WP_REST_Response( [
+				'checkout_url'   => $cart['checkoutUrl'] ?? '',
+				'total_quantity' => $cart['totalQuantity'] ?? 0,
+			], 200 );
 		} catch ( \Throwable $e ) {
 			return new WP_REST_Response( [ 'error' => $e->getMessage() ], 500 );
 		}

@@ -2,9 +2,10 @@
 (function () {
   'use strict';
 
-  const cfg = window.wordpifyPublic ?? {};
+  const cfg     = window.wordpifyPublic ?? {};
   const restUrl = (cfg.restUrl ?? '').replace(/\/$/, '') + '/wordpify/v1';
   const nonce   = cfg.nonce ?? '';
+  const cartUrl = cfg.cartUrl ?? '/cart/';
 
   async function api(path, options = {}) {
     const res = await fetch(restUrl + path, {
@@ -233,6 +234,58 @@
       }
     });
   }
+
+  // --- Checkout iframe ---
+  const checkoutIframe = document.getElementById('wordpify-checkout-iframe');
+  if (checkoutIframe) {
+    api('/cart/checkout').then(data => {
+      // Empty or missing cart — send back to cart page
+      if (!data.checkout_url || !data.total_quantity) {
+        window.location.replace(cartUrl);
+        return;
+      }
+
+      const loading = document.getElementById('wordpify-checkout-loading');
+
+      checkoutIframe.addEventListener('load', () => {
+        checkoutIframe.style.display = 'block';
+        loading?.remove();
+      });
+
+      checkoutIframe.src = data.checkout_url;
+
+      // Fallback: if Shopify blocks the iframe after 4s, redirect instead
+      setTimeout(() => {
+        if (checkoutIframe.style.display === 'none') {
+          window.location.href = data.checkout_url;
+        }
+      }, 4000);
+    }).catch(() => {
+      showToast('Could not load checkout.', 'error');
+    });
+  }
+
+  // --- Proceed to Checkout ---
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.wordpify-checkout-btn');
+    if (!btn) return;
+    e.preventDefault();
+
+    const origText = btn.textContent.trim();
+    btn.classList.add('is-updating');
+    btn.textContent = 'Redirecting…';
+
+    try {
+      const data = await api('/cart/checkout');
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      }
+    } catch (err) {
+      btn.classList.remove('is-updating');
+      btn.textContent = origText;
+      showToast(err.message || 'Could not proceed to checkout.', 'error');
+    }
+  });
 
   // --- Refresh cart count (mini-cart) ---
   async function refreshCartCount() {

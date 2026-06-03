@@ -5,9 +5,8 @@
  * @var array $cart  Shopify cart object.
  */
 defined( 'ABSPATH' ) || exit;
-$lines     = $cart['lines']['nodes'] ?? [];
-$total     = $cart['cost']['totalAmount'] ?? [];
-$checkout  = $cart['checkoutUrl'] ?? '';
+$lines = $cart['lines']['nodes'] ?? [];
+$total = $cart['cost']['totalAmount'] ?? [];
 ?>
 <div class="wordpify-cart" id="wordpify-cart">
 	<h3><?php esc_html_e( 'Your Cart', 'wordpify' ); ?></h3>
@@ -47,10 +46,8 @@ $checkout  = $cart['checkoutUrl'] ?? '';
 		<strong><?php echo esc_html( ( $total['amount'] ?? '' ) . ' ' . ( $total['currencyCode'] ?? '' ) ); ?></strong>
 	</div>
 
-	<?php if ( $checkout ) : ?>
-	<a href="<?php echo esc_url( $checkout ); ?>" class="wordpify-btn wordpify-btn--primary wordpify-checkout-btn">
+	<a href="<?php echo esc_url( home_url( '/checkout/' ) ); ?>" class="wordpify-btn wordpify-btn--primary wordpify-checkout-btn">
 		<?php esc_html_e( 'Proceed to Checkout', 'wordpify' ); ?>
 	</a>
-	<?php endif; ?>
 	<?php endif; ?>
 </div>
