@@ -13,7 +13,10 @@ class MiniCartShortcode {
 			return '';
 		}
 
-		$atts = shortcode_atts( [ 'show_count' => true ], $atts, 'wordpify_mini_cart' );
+		$atts = shortcode_atts( [
+			'show_count' => true,
+			'cart_url'   => '',
+		], $atts, 'wordpify_mini_cart' );
 
 		$item_count = 0;
 		try {
@@ -25,6 +28,7 @@ class MiniCartShortcode {
 		}
 
 		$show_count = filter_var( $atts['show_count'], FILTER_VALIDATE_BOOLEAN );
+		$cart_url   = esc_url_raw( $atts['cart_url'] );
 
 		ob_start();
 		include WORDPIFY_PATH . 'templates/cart/mini-cart.php';

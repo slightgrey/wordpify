@@ -30,11 +30,21 @@ class MiniCartWidget extends Widget_Base {
 			'default'      => 'yes',
 		] );
 
+		$this->add_control( 'cart_url', [
+			'label'       => __( 'Cart Page Link', 'wordpify' ),
+			'type'        => Controls_Manager::TEXT,
+			'placeholder' => '/cart',
+			'description' => __( 'Optional. When set, clicking the cart icon navigates to this URL.', 'wordpify' ),
+		] );
+
 		$this->end_controls_section();
 	}
 
 	protected function render(): void {
 		$s = $this->get_settings_for_display();
-		echo MiniCartShortcode::render( [ 'show_count' => $s['show_count'] === 'yes' ] );
+		echo MiniCartShortcode::render( [
+			'show_count' => $s['show_count'] === 'yes',
+			'cart_url'   => $s['cart_url'] ?? '',
+		] );
 	}
 }

@@ -3,7 +3,7 @@
  * Plugin Name: Wordpify
  * Plugin URI:  https://github.com/wordpify
  * Description: WordPress + Shopify integration via Storefront API. Syncs products, manages cart, and handles agent customer accounts.
- * Version:     1.2.1
+ * Version:     1.2.2
  * Author:      Web of D
  * Author URI: https://vincelayte.me/
  * Text Domain: wordpify
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WORDPIFY_VERSION', '1.2.1' );
+define( 'WORDPIFY_VERSION', '1.2.2' );
 define( 'WORDPIFY_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WORDPIFY_URL', plugin_dir_url( __FILE__ ) );
 define( 'WORDPIFY_BASENAME', plugin_basename( __FILE__ ) );
