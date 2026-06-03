@@ -28,8 +28,11 @@
 .wordpify-product-card__image img {
   width: 100%; height: 220px; object-fit: cover; display: block;
 }
-.wordpify-product-card__body { padding: 1rem; }
+.wordpify-product-card { display: flex; flex-direction: column; }
+.wordpify-product-card__body { padding: 1rem; display: flex; flex-direction: column; flex: 1; }
+.wordpify-product-card__body .wordpify-btn { margin-top: auto; align-self: flex-start; }
 .wordpify-product-card__title { font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem; }
+.wordpify-product-card__excerpt { color: #6b7280; margin: 0 0 0.5rem; font-size: 0.8125rem; line-height: 1.5; }
 .wordpify-product-card__price { color: #6b7280; margin: 0 0 0.75rem; font-size: 0.875rem; }
 
 /* Buttons */
