@@ -265,7 +265,9 @@
     try {
       const data = await api('/cart/checkout');
       if (data.checkout_url) {
-        window.location.href = data.checkout_url;
+        window.open(data.checkout_url, '_blank', 'noopener,noreferrer');
+        btn.classList.remove('is-updating');
+        btn.textContent = origText;
       }
     } catch (err) {
       btn.classList.remove('is-updating');
