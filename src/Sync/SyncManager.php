@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Wordpify\Sync;
 
 use Wordpify\Options;
+use Wordpify\PostTypes\ProductPostType;
 use Wordpify\Shopify\ProductQuery;
 use Wordpify\Shopify\StorefrontClient;
 
@@ -21,11 +22,12 @@ class SyncManager {
 		update_option( Options::SYNC_SETTINGS, $settings );
 
 		try {
-			$client    = new StorefrontClient();
-			$cursor    = null;
-			$count     = 0;
-			$page      = 0;
-			$max_pages = (int) apply_filters( 'wordpify_sync_max_pages', 500 );
+			$client     = new StorefrontClient();
+			$cursor     = null;
+			$count      = 0;
+			$page       = 0;
+			$max_pages  = (int) apply_filters( 'wordpify_sync_max_pages', 500 );
+			$synced_ids = [];
 
 			do {
 				if ( ++$page > $max_pages ) {
@@ -45,11 +47,16 @@ class SyncManager {
 
 				foreach ( $nodes as $product ) {
 					ProductImporter::upsert( $product );
+					$synced_ids[] = (string) ( $product['id'] ?? '' );
 					$count++;
 				}
 
 				$cursor = $page_info['hasNextPage'] ? ( $page_info['endCursor'] ?? null ) : null;
 			} while ( $cursor );
+
+			if ( $count > 0 ) {
+				self::prune_unsynced( $synced_ids );
+			}
 
 			$settings['last_sync_status']  = 'success';
 			$settings['last_sync_message'] = $count === 0
@@ -66,5 +73,29 @@ class SyncManager {
 		}
 
 		update_option( Options::SYNC_SETTINGS, $settings );
+	}
+
+	/**
+	 * Trash any synced product post whose Shopify ID didn't come back in this run
+	 * (deleted, unpublished, or removed from the sales channel in Shopify).
+	 */
+	private static function prune_unsynced( array $synced_ids ): void {
+		$stale_ids = get_posts( [
+			'post_type'      => ProductPostType::POST_TYPE,
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => [
+				[
+					'key'     => '_wordpify_shopify_product_id',
+					'value'   => $synced_ids,
+					'compare' => 'NOT IN',
+				],
+			],
+		] );
+
+		foreach ( $stale_ids as $post_id ) {
+			wp_trash_post( $post_id );
+		}
 	}
 }

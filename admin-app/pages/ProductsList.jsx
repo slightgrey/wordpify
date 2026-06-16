@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Copy, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Copy, Check, ArrowUpDown } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
+import ProductReorder from '@/pages/ProductReorder';
 
 function CopyShortcode({ id }) {
   const [copied, setCopied] = useState(false);
@@ -30,17 +31,28 @@ function CopyShortcode({ id }) {
 
 export default function ProductsList() {
   const [page, setPage] = useState(1);
+  const [reordering, setReordering] = useState(false);
   const { data, isLoading } = useProducts(page, 20);
 
   const products = data?.products ?? [];
   const total = data?.total ?? 0;
   const totalPages = data?.total_pages ?? 1;
 
+  if (reordering) {
+    return <ProductReorder onDone={() => setReordering(false)} />;
+  }
+
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Synced Products</h1>
-        <Badge variant="secondary">{total} total</Badge>
+        <div className="flex items-center gap-3">
+          <Badge variant="secondary">{total} total</Badge>
+          <Button variant="outline" size="sm" onClick={() => setReordering(true)}>
+            <ArrowUpDown className="h-4 w-4" />
+            Reorder Products
+          </Button>
+        </div>
       </div>
 
       <Card>

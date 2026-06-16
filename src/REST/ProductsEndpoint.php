@@ -21,6 +21,21 @@ class ProductsEndpoint {
 				'per_page' => [ 'default' => 20, 'type' => 'integer' ],
 			],
 		] );
+
+		register_rest_route( 'wordpify/v1', '/products/order', [
+			'methods'             => 'GET',
+			'callback'            => [ self::class, 'get_order' ],
+			'permission_callback' => fn() => current_user_can( 'manage_options' ),
+		] );
+
+		register_rest_route( 'wordpify/v1', '/products/order', [
+			'methods'             => 'POST',
+			'callback'            => [ self::class, 'update_order' ],
+			'permission_callback' => fn() => current_user_can( 'manage_options' ),
+			'args'                => [
+				'order' => [ 'required' => true, 'type' => 'array' ],
+			],
+		] );
 	}
 
 	public static function get( WP_REST_Request $request ): WP_REST_Response {
@@ -32,7 +47,7 @@ class ProductsEndpoint {
 			'post_status'    => 'publish',
 			'posts_per_page' => $per_page,
 			'paged'          => $page,
-			'orderby'        => 'title',
+			'orderby'        => 'menu_order',
 			'order'          => 'ASC',
 		] );
 
@@ -57,5 +72,50 @@ class ProductsEndpoint {
 			'total'       => (int) $query->found_posts,
 			'total_pages' => (int) $query->max_num_pages,
 		], 200 );
+	}
+
+	public static function get_order(): WP_REST_Response {
+		$query = new WP_Query( [
+			'post_type'      => ProductPostType::POST_TYPE,
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'menu_order',
+			'order'          => 'ASC',
+		] );
+
+		$products = [];
+		foreach ( $query->posts as $post ) {
+			$images = json_decode( get_post_meta( $post->ID, '_wordpify_images', true ) ?: '[]', true );
+
+			$products[] = [
+				'id'         => $post->ID,
+				'title'      => $post->post_title,
+				'image_url'  => $images[0] ?? '',
+				'menu_order' => (int) $post->menu_order,
+			];
+		}
+
+		return new WP_REST_Response( [ 'products' => $products ], 200 );
+	}
+
+	public static function update_order( WP_REST_Request $request ): WP_REST_Response {
+		global $wpdb;
+
+		$order = $request->get_param( 'order' );
+		if ( ! is_array( $order ) || empty( $order ) ) {
+			return new WP_REST_Response( [ 'message' => __( 'order must be a non-empty array of product IDs.', 'wordpify' ) ], 400 );
+		}
+
+		foreach ( array_values( $order ) as $index => $id ) {
+			$id = (int) $id;
+			if ( $id <= 0 || get_post_type( $id ) !== ProductPostType::POST_TYPE ) {
+				continue;
+			}
+
+			$wpdb->update( $wpdb->posts, [ 'menu_order' => $index ], [ 'ID' => $id ] );
+			clean_post_cache( $id );
+		}
+
+		return new WP_REST_Response( [ 'success' => true ], 200 );
 	}
 }

@@ -19,7 +19,7 @@ class ProductGridShortcode {
 			'columns'           => 3,
 			'collection'        => '',
 			'limit'             => 12,
-			'orderby'           => 'title',
+			'orderby'           => 'menu_order',
 			'image_height'      => 220,
 			'heading_color'     => '#111827',
 			'heading_font_size' => 16,
@@ -34,7 +34,7 @@ class ProductGridShortcode {
 			'post_type'      => ProductPostType::POST_TYPE,
 			'post_status'    => 'publish',
 			'posts_per_page' => (int) $atts['limit'],
-			'orderby'        => in_array( $atts['orderby'], [ 'title', 'date' ], true ) ? $atts['orderby'] : 'title',
+			'orderby'        => in_array( $atts['orderby'], [ 'title', 'date', 'menu_order' ], true ) ? $atts['orderby'] : 'menu_order',
 			'order'          => 'ASC',
 		];
 

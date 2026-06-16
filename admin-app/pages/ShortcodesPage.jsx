@@ -8,7 +8,7 @@ const SHORTCODES = [
     attrs: [
       { name: 'columns',    default: '3',     note: 'Number of columns (2–4)' },
       { name: 'limit',      default: '12',    note: 'Max products to show' },
-      { name: 'orderby',    default: 'title', note: 'Sort order: title or date' },
+      { name: 'orderby',    default: 'menu_order', note: 'Sort order: menu_order (custom drag order, set in Products tab), title, or date' },
       { name: 'collection', default: '—',     note: 'Filter by collection slug' },
     ],
     examples: [

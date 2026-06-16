@@ -47,8 +47,12 @@ class ProductGridWidget extends Widget_Base {
 		$this->add_control( 'orderby', [
 			'label'   => __( 'Order By', 'wordpify' ),
 			'type'    => Controls_Manager::SELECT,
-			'default' => 'title',
-			'options' => [ 'title' => __( 'Title', 'wordpify' ), 'date' => __( 'Date', 'wordpify' ) ],
+			'default' => 'menu_order',
+			'options' => [
+				'menu_order' => __( 'Custom Order', 'wordpify' ),
+				'title'      => __( 'Title', 'wordpify' ),
+				'date'       => __( 'Date', 'wordpify' ),
+			],
 		] );
 
 		$this->end_controls_section();
