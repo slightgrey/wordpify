@@ -18,7 +18,7 @@ class ProductImporter {
 
 		$existing = get_posts( [
 			'post_type'      => ProductPostType::POST_TYPE,
-			'post_status'    => 'any',
+			'post_status'    => [ 'publish', 'trash' ],
 			'posts_per_page' => 1,
 			'meta_key'       => '_wordpify_shopify_product_id',
 			'meta_value'     => $shopify_id,
@@ -33,7 +33,13 @@ class ProductImporter {
 		];
 
 		if ( ! empty( $existing ) ) {
-			$post_data['ID'] = (int) $existing[0];
+			$post_id = (int) $existing[0];
+
+			if ( get_post_status( $post_id ) === 'trash' ) {
+				wp_untrash_post( $post_id );
+			}
+
+			$post_data['ID'] = $post_id;
 			$post_id         = wp_update_post( $post_data, true );
 		} else {
 			$post_id = wp_insert_post( $post_data, true );
