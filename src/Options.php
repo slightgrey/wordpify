@@ -10,6 +10,7 @@ class Options {
 
 	const CONNECTION          = 'wordpify_connection';
 	const SYNC_SETTINGS       = 'wordpify_sync_settings';
+	const SHOP_SETTINGS       = 'wordpify_shop_settings';
 	const VERSION             = 'wordpify_version';
 	const DELETE_ON_UNINSTALL = 'wordpify_delete_on_uninstall';
 
@@ -33,6 +34,16 @@ class Options {
 			'last_sync_status'  => 'idle',
 			'last_sync_message' => null,
 			'product_count'     => 0,
+		];
+	}
+
+	public static function get_shop_settings(): array {
+		return (array) get_option( self::SHOP_SETTINGS, [] ) + [
+			'gst_cart_enabled'       => true,
+			'gst_product_enabled'    => false,
+			'gst_text'               => '+ GST',
+			'checkout_notice_enabled' => true,
+			'checkout_notice'         => 'Shipping calculated at checkout',
 		];
 	}
 

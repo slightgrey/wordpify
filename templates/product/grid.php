@@ -15,6 +15,10 @@ $currency_symbols = [
 	'JPY' => '¥',
 	'NZD' => '$',
 ];
+$shop = (array) get_option( 'wordpify_shop_settings', [] ) + [
+	'gst_product_enabled' => false,
+	'gst_text'            => '+ GST',
+];
 ?>
 <div class="wordpify-product-grid wordpify-product-grid--cols-<?php echo esc_attr( $columns ); ?>">
 	<?php foreach ( $products as $product ) :
@@ -45,7 +49,7 @@ $currency_symbols = [
 			<?php endif; ?>
 			<?php if ( count( $variants ) === 1 ) : ?>
 			<?php if ( $price ) : ?>
-			<p class="wordpify-product-card__price"><?php echo esc_html( $price ); ?></p>
+			<p class="wordpify-product-card__price"><?php echo esc_html( $price ); ?><?php if ( ! empty( $shop['gst_product_enabled'] ) ) : ?> <small><?php echo esc_html( $shop['gst_text'] ); ?></small><?php endif; ?></p>
 			<?php endif; ?>
 			<button class="wordpify-btn wordpify-btn--primary wordpify-add-to-cart"
 				style="background-color:<?php echo esc_attr( $style['btn_bg_color'] ); ?>;color:<?php echo esc_attr( $style['btn_text_color'] ); ?>;border-radius:<?php echo esc_attr( $style['btn_border_radius'] ); ?>px;"
@@ -55,7 +59,7 @@ $currency_symbols = [
 			</button>
 			<?php else : ?>
 			<?php if ( $price ) : ?>
-			<p class="wordpify-product-card__price"><?php echo esc_html( $price ); ?></p>
+			<p class="wordpify-product-card__price"><?php echo esc_html( $price ); ?><?php if ( ! empty( $shop['gst_product_enabled'] ) ) : ?> <small><?php echo esc_html( $shop['gst_text'] ); ?></small><?php endif; ?></p>
 			<?php endif; ?>
 			<a href="#wordpify-product-<?php echo esc_attr( $product->ID ); ?>" class="wordpify-btn wordpify-btn--secondary wordpify-view-product">
 				<?php esc_html_e( 'View Options', 'wordpify' ); ?>

@@ -1,6 +1,6 @@
 import { HashRouter, Routes, Route, NavLink } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { LayoutDashboard, Link2, RefreshCw, Package, Code2, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Link2, RefreshCw, Package, Code2, BookOpen, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Dashboard from '@/pages/Dashboard';
 import ConnectionSettings from '@/pages/ConnectionSettings';
@@ -8,6 +8,7 @@ import SyncSettings from '@/pages/SyncSettings';
 import ProductsList from '@/pages/ProductsList';
 import ShortcodesPage from '@/pages/ShortcodesPage';
 import FeaturesGuide from '@/pages/FeaturesGuide';
+import ShopSettings from '@/pages/ShopSettings';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000 } },
@@ -17,6 +18,7 @@ const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/connection', label: 'Connection', icon: Link2 },
   { to: '/sync', label: 'Sync Settings', icon: RefreshCw },
+  { to: '/shop', label: 'Shop', icon: Store },
   { to: '/products', label: 'Products', icon: Package },
   { to: '/shortcodes', label: 'Shortcodes', icon: Code2 },
   { to: '/guide', label: 'Features & Setup', icon: BookOpen },
@@ -75,6 +77,7 @@ export default function App() {
               <Route path="/products" element={<ProductsList />} />
               <Route path="/shortcodes" element={<ShortcodesPage />} />
               <Route path="/guide" element={<FeaturesGuide />} />
+              <Route path="/shop" element={<ShopSettings />} />
             </Routes>
           </main>
         </div>

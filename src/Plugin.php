@@ -16,6 +16,7 @@ use Wordpify\REST\CartEndpoint;
 use Wordpify\REST\ConnectionEndpoint;
 use Wordpify\REST\ProductsEndpoint;
 use Wordpify\REST\SettingsEndpoint;
+use Wordpify\REST\ShopEndpoint;
 use Wordpify\REST\SyncEndpoint;
 use Wordpify\Sync\SyncManager;
 
@@ -48,6 +49,7 @@ class Plugin {
 		add_action( 'rest_api_init', [ ProductsEndpoint::class, 'register_routes' ] );
 		add_action( 'rest_api_init', [ CartEndpoint::class, 'register_routes' ] );
 		add_action( 'rest_api_init', [ AuthEndpoint::class, 'register_routes' ] );
+		add_action( 'rest_api_init', [ ShopEndpoint::class, 'register_routes' ] );
 
 		// Admin.
 		add_action( 'admin_menu', [ AdminPage::class, 'register' ] );
