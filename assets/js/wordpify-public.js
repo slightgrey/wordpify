@@ -73,6 +73,9 @@
       if (sel) activeVariantId = sel.value;
     }
 
+    const qtyInput = btn.closest('.wordpify-product-single')?.querySelector('.wordpify-qty-input');
+    const quantity = Math.min(999, Math.max(1, parseInt(qtyInput?.value ?? btn.dataset.quantity, 10) || 1));
+
     btn.classList.add('is-loading');
     btn.disabled = true;
     const origText = btn.textContent;
@@ -81,10 +84,12 @@
     try {
       await api('/cart/items', {
         method: 'POST',
-        body: { lines: [{ merchandiseId: activeVariantId, quantity: 1 }] },
+        body: { lines: [{ merchandiseId: activeVariantId, quantity }] },
       });
       refreshCartCount();
       showToast('Added to cart!');
+      if (qtyInput) qtyInput.value = 1;
+      document.dispatchEvent(new CustomEvent('wordpify:added-to-cart', { detail: { button: btn } }));
     } catch (err) {
       console.error('Wordpify: add to cart failed', err);
       showToast(err.message || 'Could not add to cart.', 'error');
@@ -94,6 +99,117 @@
       btn.textContent = origText;
     }
   });
+
+  // --- Single product gallery: thumbnail swaps main image ---
+  document.addEventListener('click', (e) => {
+    const thumb = e.target.closest('.wordpify-product-single__thumb');
+    if (!thumb) return;
+
+    const gallery = thumb.closest('.wordpify-product-single__gallery');
+    const main    = gallery?.querySelector('.wordpify-product-single__main-image img');
+    if (!main) return;
+
+    main.src = thumb.dataset.image;
+    gallery.querySelectorAll('.wordpify-product-single__thumb').forEach((t) => t.classList.toggle('is-active', t === thumb));
+  });
+
+  // --- Single product quantity stepper ---
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.wordpify-qty-stepper__btn');
+    if (!btn) return;
+
+    const input = btn.closest('.wordpify-qty-stepper').querySelector('.wordpify-qty-input');
+    input.value = Math.min(999, Math.max(1, (parseInt(input.value, 10) || 1) + Number(btn.dataset.step)));
+  });
+
+  // --- Product popup (grid + [wordpify_product] on the same page) ---
+  // Grid links point to ?item=<handle>. Here they open in the popup instead of reloading,
+  // keeping the URL shareable; Back / Esc / backdrop / × close it.
+  const productModal = document.getElementById('wordpify-product-modal');
+  if (productModal) {
+    // Move to <body>: theme/builder wrappers with transform/filter/contain would otherwise
+    // trap the fixed overlay inside their box (and their stacking context).
+    if (productModal.parentElement !== document.body) document.body.appendChild(productModal);
+
+    const modalBody  = productModal.querySelector('.wordpify-modal__body');
+    let loadToken    = 0;
+    let returnFocus  = null;
+
+    const itemFromUrl = (href) => new URL(href, location.href).searchParams.get('item');
+
+    const showModal = () => {
+      productModal.hidden = false;
+      document.documentElement.classList.add('wordpify-modal-open');
+      productModal.querySelector('.wordpify-modal__close')?.focus();
+    };
+
+    const hideModal = () => {
+      loadToken++;
+      productModal.hidden = true;
+      modalBody.innerHTML = '';
+      document.documentElement.classList.remove('wordpify-modal-open');
+      returnFocus?.focus();
+      returnFocus = null;
+    };
+
+    const loadProduct = async (handle) => {
+      const token = ++loadToken;
+      modalBody.innerHTML = '<p class="wordpify-modal__status">Loading…</p>';
+      showModal();
+      try {
+        const res = await api('/products/html?handle=' + encodeURIComponent(handle));
+        if (token === loadToken) modalBody.innerHTML = res.html;
+      } catch (err) {
+        if (token === loadToken) modalBody.innerHTML = '<p class="wordpify-modal__status">Product not found.</p>';
+      }
+    };
+
+    // Entries we pushed carry state; closing one goes Back, otherwise just drop ?item.
+    const requestClose = () => {
+      if (history.state?.wordpifyItem) {
+        history.back();
+        return;
+      }
+      const url = new URL(location.href);
+      url.searchParams.delete('item');
+      history.replaceState(null, '', url);
+      hideModal();
+    };
+
+    if (!productModal.hidden) showModal(); // opened server-side from ?item=
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('.wordpify-product-card__link, .wordpify-view-product');
+      if (!link || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+      const url    = new URL(link.href, location.href);
+      const handle = url.searchParams.get('item');
+      if (!handle || url.pathname !== location.pathname) return; // product page is elsewhere
+
+      e.preventDefault();
+      returnFocus = link;
+      history.pushState({ wordpifyItem: handle }, '', url);
+      loadProduct(handle);
+    });
+
+    productModal.addEventListener('click', (e) => {
+      if (e.target.closest('[data-wordpify-close]')) requestClose();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !productModal.hidden) requestClose();
+    });
+
+    document.addEventListener('wordpify:added-to-cart', (e) => {
+      if (!productModal.hidden && productModal.contains(e.detail.button)) requestClose();
+    });
+
+    window.addEventListener('popstate', () => {
+      const handle = itemFromUrl(location.href);
+      if (handle) loadProduct(handle);
+      else hideModal();
+    });
+  }
 
   // --- Qty update (debounced 800ms) ---
   const qtyTimers  = {};

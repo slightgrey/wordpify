@@ -25,6 +25,19 @@ class ProductSingleWidget extends Widget_Base {
 			'label'       => __( 'Product Handle', 'wordpify' ),
 			'type'        => Controls_Manager::TEXT,
 			'placeholder' => __( 'e.g. my-product', 'wordpify' ),
+			'description' => __( 'Leave empty on your product page to show the product linked from the product grid.', 'wordpify' ),
+		] );
+
+		$this->add_control( 'show_title', [
+			'label'       => __( 'Product Title', 'wordpify' ),
+			'type'        => Controls_Manager::SELECT,
+			'default'     => 'auto',
+			'options'     => [
+				'auto' => __( 'Auto', 'wordpify' ),
+				'yes'  => __( 'Show', 'wordpify' ),
+				'no'   => __( 'Hide', 'wordpify' ),
+			],
+			'description' => __( 'Auto hides it on the product page, where the page title already shows the product name. Choose Show if your layout hides the page title.', 'wordpify' ),
 		] );
 
 		$this->end_controls_section();
@@ -32,6 +45,9 @@ class ProductSingleWidget extends Widget_Base {
 
 	protected function render(): void {
 		$s = $this->get_settings_for_display();
-		echo ProductSingleShortcode::render( [ 'handle' => $s['handle'] ] );
+		echo ProductSingleShortcode::render( [
+			'handle'     => $s['handle'],
+			'show_title' => $s['show_title'] ?? 'auto',
+		] );
 	}
 }

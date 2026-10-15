@@ -36,6 +36,7 @@ class ProductGridShortcode {
 			'posts_per_page' => (int) $atts['limit'],
 			'orderby'        => in_array( $atts['orderby'], [ 'title', 'date', 'menu_order' ], true ) ? $atts['orderby'] : 'menu_order',
 			'order'          => 'ASC',
+			'meta_query'     => [ ProductPostType::enabled_meta_clause() ],
 		];
 
 		if ( $atts['collection'] ) {

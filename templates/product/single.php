@@ -5,18 +5,32 @@
  * @var WP_Post $product
  * @var array   $variants
  * @var array   $images
+ * @var bool    $show_title
  */
 defined( 'ABSPATH' ) || exit;
 $first_image = $images[0] ?? '';
 ?>
 <div class="wordpify-product-single" id="wordpify-product-<?php echo esc_attr( $product->ID ); ?>">
+	<?php if ( $first_image ) : ?>
 	<div class="wordpify-product-single__gallery">
-		<?php foreach ( $images as $img ) : ?>
-		<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $product->post_title ); ?>" loading="lazy" />
-		<?php endforeach; ?>
+		<div class="wordpify-product-single__main-image">
+			<img src="<?php echo esc_url( $first_image ); ?>" alt="<?php echo esc_attr( $product->post_title ); ?>" />
+		</div>
+		<?php if ( count( $images ) > 1 ) : ?>
+		<div class="wordpify-product-single__thumbs">
+			<?php foreach ( $images as $i => $img ) : ?>
+			<button type="button" class="wordpify-product-single__thumb<?php echo $i === 0 ? ' is-active' : ''; ?>" data-image="<?php echo esc_url( $img ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Show image %d', 'wordpify' ), $i + 1 ) ); ?>">
+				<img src="<?php echo esc_url( $img ); ?>" alt="" loading="lazy" />
+			</button>
+			<?php endforeach; ?>
+		</div>
+		<?php endif; ?>
 	</div>
+	<?php endif; ?>
 	<div class="wordpify-product-single__info">
+		<?php if ( $show_title ) : ?>
 		<h2 class="wordpify-product-single__title"><?php echo esc_html( $product->post_title ); ?></h2>
+		<?php endif; ?>
 
 		<?php if ( ! empty( $variants ) ) : ?>
 		<div class="wordpify-product-single__price">
@@ -63,11 +77,19 @@ $first_image = $images[0] ?? '';
 		</div>
 		<?php endif; ?>
 
-		<button class="wordpify-btn wordpify-btn--primary wordpify-add-to-cart"
-			data-variant-id="<?php echo esc_attr( $variants[0]['id'] ?? '' ); ?>"
-			data-product-id="<?php echo esc_attr( $product->ID ); ?>"
-			data-quantity="1">
-			<?php esc_html_e( 'Add to Cart', 'wordpify' ); ?>
-		</button>
+		<label class="wordpify-product-single__qty-label" for="wordpify-qty-<?php echo esc_attr( $product->ID ); ?>"><?php esc_html_e( 'Quantity', 'wordpify' ); ?></label>
+		<div class="wordpify-product-single__purchase">
+			<div class="wordpify-qty-stepper">
+				<button type="button" class="wordpify-qty-stepper__btn" data-step="-1" aria-label="<?php esc_attr_e( 'Decrease quantity', 'wordpify' ); ?>">&minus;</button>
+				<input type="number" id="wordpify-qty-<?php echo esc_attr( $product->ID ); ?>" class="wordpify-qty-input" value="1" min="1" max="999" step="1" inputmode="numeric" />
+				<button type="button" class="wordpify-qty-stepper__btn" data-step="1" aria-label="<?php esc_attr_e( 'Increase quantity', 'wordpify' ); ?>">+</button>
+			</div>
+			<button class="wordpify-btn wordpify-btn--primary wordpify-add-to-cart"
+				data-variant-id="<?php echo esc_attr( $variants[0]['id'] ?? '' ); ?>"
+				data-product-id="<?php echo esc_attr( $product->ID ); ?>"
+				data-quantity="1">
+				<?php esc_html_e( 'Add to Cart', 'wordpify' ); ?>
+			</button>
+		</div>
 	</div>
 </div>

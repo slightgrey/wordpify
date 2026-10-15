@@ -15,6 +15,17 @@ export function useProductOrder() {
   });
 }
 
+export function useSetProductEnabled() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, enabled }) => apiFetch(`/products/${id}/enabled`, { method: 'POST', body: { enabled } }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
 export function useUpdateProductOrder() {
   const queryClient = useQueryClient();
 

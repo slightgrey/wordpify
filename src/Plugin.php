@@ -7,6 +7,7 @@ namespace Wordpify;
 use Wordpify\Admin\AdminPage;
 use Wordpify\Cart\CartManager;
 use Wordpify\Elementor\ElementorManager;
+use Wordpify\Frontend\ProductLink;
 use Wordpify\Frontend\PublicAssets;
 use Wordpify\Frontend\ShortcodeRegistry;
 use Wordpify\PostTypes\CollectionTaxonomy;
@@ -57,6 +58,10 @@ class Plugin {
 
 		// Frontend assets.
 		add_action( 'wp_enqueue_scripts', [ PublicAssets::class, 'enqueue' ] );
+
+		// Product page links.
+		add_filter( 'document_title_parts', [ ProductLink::class, 'filter_document_title' ] );
+		add_filter( 'the_title', [ ProductLink::class, 'filter_the_title' ], 10, 2 );
 
 		// Cron handler.
 		add_action( 'wordpify_sync_products', [ SyncManager::class, 'run' ] );

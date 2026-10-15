@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Copy, Check, ArrowUpDown } from 'lucide-react';
-import { useProducts } from '@/hooks/useProducts';
+import { Switch } from '@/components/ui/switch';
+import { useProducts, useSetProductEnabled } from '@/hooks/useProducts';
 import ProductReorder from '@/pages/ProductReorder';
 
 function CopyShortcode({ id }) {
@@ -33,6 +34,17 @@ export default function ProductsList() {
   const [page, setPage] = useState(1);
   const [reordering, setReordering] = useState(false);
   const { data, isLoading } = useProducts(page, 20);
+  const setEnabled = useSetProductEnabled();
+  // Optimistic switch state while the request runs.
+  const [pendingEnabled, setPendingEnabled] = useState({});
+
+  const handleToggle = (id, enabled) => {
+    setPendingEnabled((prev) => ({ ...prev, [id]: enabled }));
+    setEnabled.mutate(
+      { id, enabled },
+      { onSettled: () => setPendingEnabled(({ [id]: _, ...rest }) => rest) }
+    );
+  };
 
   const products = data?.products ?? [];
   const total = data?.total ?? 0;
@@ -65,6 +77,7 @@ export default function ProductsList() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
+                  <th className="text-left px-4 py-3 font-medium" title="Disabled products are hidden from the storefront">Enabled</th>
                   <th className="text-left px-4 py-3 font-medium">Product</th>
                   <th className="text-left px-4 py-3 font-medium">Handle</th>
                   <th className="text-left px-4 py-3 font-medium">Variants</th>
@@ -73,9 +86,18 @@ export default function ProductsList() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
+                {products.map((p) => {
+                  const enabled = pendingEnabled[p.id] ?? p.enabled;
+                  return (
                   <tr key={p.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
+                      <Switch
+                        checked={enabled}
+                        onCheckedChange={(checked) => handleToggle(p.id, checked)}
+                        aria-label={`${enabled ? 'Disable' : 'Enable'} ${p.title}`}
+                      />
+                    </td>
+                    <td className={`px-4 py-3 ${enabled ? '' : 'opacity-60'}`}>
                       <div className="flex items-center gap-3">
                         {p.image_url && (
                           <img src={p.image_url} alt={p.title} className="h-10 w-10 rounded object-cover border" />
@@ -83,6 +105,7 @@ export default function ProductsList() {
                         <div>
                           <span className="font-medium">{p.title}</span>
                           {p.is_bundle && <Badge variant="outline" className="ml-2">Bundle</Badge>}
+                          {!enabled && <Badge variant="secondary" className="ml-2">Disabled</Badge>}
                           <p className="text-xs text-muted-foreground">ID: {p.id}</p>
                         </div>
                       </div>
@@ -98,7 +121,8 @@ export default function ProductsList() {
                       <CopyShortcode id={p.id} />
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           )}

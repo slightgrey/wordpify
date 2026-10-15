@@ -22,9 +22,14 @@ const SHORTCODES = [
     description: 'Displays a single product with image gallery, description, variant selector, and add-to-cart.',
     attrs: [
       { name: 'id', default: '—', note: 'WordPress post ID of the product' },
+      { name: 'handle', default: '—', note: 'Shopify product handle. Omit both id and handle on your Product Page (Shop settings) to show the product clicked in the grid.' },
+      { name: 'show_title', default: 'auto', note: 'auto | yes | no. Auto hides the title on the Product Page, where the page heading already shows the product name. Use yes if your theme hides page titles.' },
+      { name: 'display', default: 'auto', note: 'auto | inline | popup. Auto opens products in a popup when this shortcode (without id/handle) is on the same page as [wordpify_products].' },
     ],
     examples: [
+      '[wordpify_product]',
       '[wordpify_product id="42"]',
+      '[wordpify_product handle="my-product"]',
     ],
   },
   {

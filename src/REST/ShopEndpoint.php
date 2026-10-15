@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Wordpify\REST;
 
+use Wordpify\Frontend\ProductLink;
 use Wordpify\Options;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -46,13 +47,33 @@ class ShopEndpoint {
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
 					],
+					'product_page_id'         => [ 'required' => false, 'type' => 'integer' ],
 				],
 			],
 		] );
 	}
 
 	public static function get( WP_REST_Request $_request ): WP_REST_Response {
-		return new WP_REST_Response( Options::get_shop_settings(), 200 );
+		$pages = get_pages( [ 'post_status' => 'publish', 'sort_column' => 'post_title' ] );
+
+		return new WP_REST_Response( Options::get_shop_settings() + [
+			'available_pages' => array_map(
+				fn( $page ) => [
+					'id'              => $page->ID,
+					'title'           => $page->post_title ?: __( '(no title)', 'wordpify' ),
+					'has_single_view' => self::has_single_view( $page ),
+				],
+				$pages
+			),
+		], 200 );
+	}
+
+	/**
+	 * Whether a page can display a single product: it holds [wordpify_product]
+	 * or the Elementor Single Product widget.
+	 */
+	private static function has_single_view( \WP_Post $page ): bool {
+		return ProductLink::page_contains( $page->ID, 'wordpify_product', 'wordpify-product-single' );
 	}
 
 	public static function save( WP_REST_Request $request ): WP_REST_Response {
@@ -81,6 +102,15 @@ class ShopEndpoint {
 		$checkout_notice = $request->get_param( 'checkout_notice' );
 		if ( $checkout_notice !== null ) {
 			$current['checkout_notice'] = sanitize_text_field( $checkout_notice );
+		}
+
+		$product_page_id = $request->get_param( 'product_page_id' );
+		if ( $product_page_id !== null ) {
+			$product_page_id = (int) $product_page_id;
+			if ( $product_page_id !== 0 && get_post_type( $product_page_id ) !== 'page' ) {
+				return new WP_REST_Response( [ 'message' => __( 'Product page must be a page.', 'wordpify' ) ], 400 );
+			}
+			$current['product_page_id'] = $product_page_id;
 		}
 
 		update_option( Options::SHOP_SETTINGS, $current );

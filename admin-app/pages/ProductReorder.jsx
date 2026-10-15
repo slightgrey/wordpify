@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { GripVertical, ArrowLeft } from 'lucide-react';
 import { useProductOrder, useUpdateProductOrder } from '@/hooks/useProducts';
 
@@ -83,7 +84,8 @@ export default function ProductReorder({ onDone }) {
                   {p.image_url && (
                     <img src={p.image_url} alt={p.title} className="h-10 w-10 rounded object-cover border" />
                   )}
-                  <span className="font-medium text-sm">{p.title}</span>
+                  <span className={`font-medium text-sm ${p.enabled === false ? 'opacity-60' : ''}`}>{p.title}</span>
+                  {p.enabled === false && <Badge variant="secondary">Disabled</Badge>}
                 </li>
               ))}
             </ul>
