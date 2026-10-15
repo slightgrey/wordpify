@@ -69,7 +69,7 @@ export default function FeaturesGuide() {
         </p>
         <div className="flex gap-4 flex-wrap">
           {[
-            { label: 'Version', value: '1.2.2' },
+            { label: 'Version', value: window.wordpifyAdmin?.version ?? '—' },
             { label: 'WordPress', value: '6.7+' },
             { label: 'PHP', value: '8.2+' },
           ].map(({ label, value }) => (

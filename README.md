@@ -4,7 +4,7 @@ Wordpify connects a WordPress site to a Shopify store through the **Shopify Stor
 
 - **Requires:** WordPress 6.7+, PHP 8.2+ (with `sodium`)
 - **Works with:** any theme. Every shortcode also has an Elementor widget.
-- **Version:** 1.3.2
+- **Version:** 1.4.0
 
 ## Features
 
