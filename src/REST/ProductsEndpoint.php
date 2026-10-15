@@ -62,6 +62,7 @@ class ProductsEndpoint {
 				'handle'         => get_post_meta( $post->ID, '_wordpify_handle', true ),
 				'shopify_id'     => get_post_meta( $post->ID, '_wordpify_shopify_product_id', true ),
 				'variant_count'  => count( $variants ),
+				'is_bundle'      => get_post_meta( $post->ID, '_wordpify_is_bundle', true ) === '1',
 				'image_url'      => $images[0] ?? '',
 				'synced_at'      => get_post_meta( $post->ID, '_wordpify_synced_at', true ),
 			];

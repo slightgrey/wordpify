@@ -28,6 +28,25 @@ $first_image = $images[0] ?? '';
 			<?php echo wp_kses_post( $product->post_content ); ?>
 		</div>
 
+		<?php if ( ! empty( $variants[0]['components'] ) ) : ?>
+		<div class="wordpify-product-single__bundle">
+			<h3 class="wordpify-product-single__bundle-title"><?php esc_html_e( "What's included", 'wordpify' ); ?></h3>
+			<ul class="wordpify-product-single__bundle-items">
+				<?php foreach ( $variants[0]['components'] as $component ) : ?>
+				<li>
+					<?php
+					$c_title = $component['product_title'];
+					if ( ! empty( $component['variant_title'] ) && $component['variant_title'] !== 'Default Title' ) {
+						$c_title .= ' — ' . $component['variant_title'];
+					}
+					echo esc_html( (int) $component['quantity'] . ' × ' . $c_title );
+					?>
+				</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php endif; ?>
+
 		<?php if ( count( $variants ) > 1 ) : ?>
 		<div class="wordpify-product-single__variants">
 			<label for="wordpify-variant-select-<?php echo esc_attr( $product->ID ); ?>"><?php esc_html_e( 'Options', 'wordpify' ); ?></label>

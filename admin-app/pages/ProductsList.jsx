@@ -82,6 +82,7 @@ export default function ProductsList() {
                         )}
                         <div>
                           <span className="font-medium">{p.title}</span>
+                          {p.is_bundle && <Badge variant="outline" className="ml-2">Bundle</Badge>}
                           <p className="text-xs text-muted-foreground">ID: {p.id}</p>
                         </div>
                       </div>

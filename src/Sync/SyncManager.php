@@ -45,8 +45,10 @@ class SyncManager {
 				$page_info = $products['pageInfo'] ?? [];
 				$nodes     = $products['nodes'] ?? [];
 
+				$components_map = self::fetch_bundle_components( $client, $nodes );
+
 				foreach ( $nodes as $product ) {
-					ProductImporter::upsert( $product );
+					ProductImporter::upsert( $product, $components_map );
 					$synced_ids[] = (string) ( $product['id'] ?? '' );
 					$count++;
 				}
@@ -73,6 +75,35 @@ class SyncManager {
 		}
 
 		update_option( Options::SYNC_SETTINGS, $settings );
+	}
+
+	/**
+	 * Fetch components for every bundle variant (requiresComponents) in a page of products.
+	 *
+	 * @return array<string, array> Map of variant GID => component nodes.
+	 */
+	private static function fetch_bundle_components( StorefrontClient $client, array $products ): array {
+		$bundle_variant_ids = [];
+		foreach ( $products as $product ) {
+			foreach ( $product['variants']['nodes'] ?? [] as $v ) {
+				if ( ! empty( $v['requiresComponents'] ) && ! empty( $v['id'] ) ) {
+					$bundle_variant_ids[] = (string) $v['id'];
+				}
+			}
+		}
+
+		$map = [];
+		foreach ( array_chunk( $bundle_variant_ids, 250 ) as $ids ) {
+			$data = $client->query( ProductQuery::get_variant_components(), [ 'ids' => $ids ] );
+
+			foreach ( $data['nodes'] ?? [] as $node ) {
+				if ( ! empty( $node['id'] ) ) {
+					$map[ (string) $node['id'] ] = $node['components']['nodes'] ?? [];
+				}
+			}
+		}
+
+		return $map;
 	}
 
 	/**

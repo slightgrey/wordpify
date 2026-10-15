@@ -40,9 +40,39 @@ class ProductQuery {
 							title
 							availableForSale
 							quantityAvailable
+							requiresComponents
 							price {
 								amount
 								currencyCode
+							}
+						}
+					}
+				}
+			}
+		}
+		GQL;
+	}
+
+	/**
+	 * Fetch the component products of bundle variants (Shopify Bundles).
+	 * Kept separate from get_all() so the main page query stays cheap.
+	 */
+	public static function get_variant_components(): string {
+		return <<<'GQL'
+		query GetVariantComponents($ids: [ID!]!) {
+			nodes(ids: $ids) {
+				... on ProductVariant {
+					id
+					components(first: 30) {
+						nodes {
+							quantity
+							productVariant {
+								id
+								title
+								product {
+									title
+									handle
+								}
 							}
 						}
 					}

@@ -52,6 +52,11 @@
 .wordpify-btn--danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
 .wordpify-btn--danger:hover { background: #fecaca; }
 
+/* Product Bundle */
+.wordpify-product-single__bundle { margin: 1rem 0; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f9fafb; }
+.wordpify-product-single__bundle-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem; }
+.wordpify-product-single__bundle-items { margin: 0; padding-left: 1.25rem; font-size: 0.875rem; line-height: 1.6; }
+
 /* Cart */
 .wordpify-cart { max-width: 800px; }
 .wordpify-cart h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }

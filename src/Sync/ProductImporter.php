@@ -12,8 +12,10 @@ class ProductImporter {
 	/**
 	 * Insert or update a WordPress post from a Shopify product node.
 	 * Returns the WP post ID.
+	 *
+	 * @param array $components_map Bundle variant GID => component nodes (see SyncManager).
 	 */
-	public static function upsert( array $product ): int {
+	public static function upsert( array $product, array $components_map = [] ): int {
 		$shopify_id = $product['id'] ?? '';
 
 		$existing = get_posts( [
@@ -56,19 +58,26 @@ class ProductImporter {
 		update_post_meta( $post_id, '_wordpify_synced_at', gmdate( 'c' ) );
 
 		// Variants.
-		$variants = [];
+		$variants  = [];
+		$is_bundle = false;
 		foreach ( $product['variants']['nodes'] ?? [] as $v ) {
+			$requires_components = (bool) ( $v['requiresComponents'] ?? false );
+			$is_bundle           = $is_bundle || $requires_components;
+
 			$variants[] = [
-				'id'                 => $v['id'],
-				'sku'                => $v['sku'] ?? '',
-				'title'              => $v['title'] ?? '',
-				'price'              => $v['price']['amount'] ?? '0',
-				'currency_code'      => $v['price']['currencyCode'] ?? '',
-				'inventory_quantity' => $v['quantityAvailable'] ?? 0,
-				'available'          => $v['availableForSale'] ?? false,
+				'id'                  => $v['id'],
+				'sku'                 => $v['sku'] ?? '',
+				'title'               => $v['title'] ?? '',
+				'price'               => $v['price']['amount'] ?? '0',
+				'currency_code'       => $v['price']['currencyCode'] ?? '',
+				'inventory_quantity'  => $v['quantityAvailable'] ?? 0,
+				'available'           => $v['availableForSale'] ?? false,
+				'requires_components' => $requires_components,
+				'components'          => self::map_components( $components_map[ $v['id'] ] ?? [] ),
 			];
 		}
 		update_post_meta( $post_id, '_wordpify_variants', wp_json_encode( $variants ) );
+		update_post_meta( $post_id, '_wordpify_is_bundle', $is_bundle ? '1' : '0' );
 
 		// Images (CDN URLs only).
 		$images = array_map(
@@ -88,6 +97,29 @@ class ProductImporter {
 		wp_set_object_terms( $post_id, $term_ids, CollectionTaxonomy::TAXONOMY );
 
 		return (int) $post_id;
+	}
+
+	/**
+	 * Normalise Shopify ProductVariantComponent nodes into the stored component shape.
+	 */
+	private static function map_components( array $nodes ): array {
+		$components = [];
+		foreach ( $nodes as $c ) {
+			$variant = $c['productVariant'] ?? [];
+			if ( empty( $variant['id'] ) ) {
+				continue;
+			}
+
+			$components[] = [
+				'variant_id'    => sanitize_text_field( $variant['id'] ),
+				'product_title' => sanitize_text_field( $variant['product']['title'] ?? '' ),
+				'variant_title' => sanitize_text_field( $variant['title'] ?? '' ),
+				'handle'        => sanitize_text_field( $variant['product']['handle'] ?? '' ),
+				'quantity'      => (int) ( $c['quantity'] ?? 1 ),
+			];
+		}
+
+		return $components;
 	}
 
 	private static function upsert_collection_term( array $col ): ?int {

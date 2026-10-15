@@ -8,16 +8,18 @@ use Wordpify\Options;
 
 class StorefrontClient {
 
+	const API_VERSION = '2026-07';
+
 	private string $endpoint;
 	private string $token;
 
 	public function __construct( string $store_domain = '', string $access_token = '' ) {
 		if ( $store_domain && $access_token ) {
-			$this->endpoint = "https://{$store_domain}/api/2024-01/graphql.json";
+			$this->endpoint = "https://{$store_domain}/api/" . self::API_VERSION . "/graphql.json";
 			$this->token    = $access_token;
 		} else {
 			$connection     = Options::get_connection();
-			$this->endpoint = "https://{$connection['store_domain']}/api/2024-01/graphql.json";
+			$this->endpoint = "https://{$connection['store_domain']}/api/" . self::API_VERSION . "/graphql.json";
 			$this->token    = $connection['access_token'];
 		}
 	}
