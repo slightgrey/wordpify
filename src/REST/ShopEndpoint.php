@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Wordpify\REST;
 
+use Wordpify\Frontend\ProductImage;
 use Wordpify\Frontend\ProductLink;
 use Wordpify\Options;
 use WP_REST_Request;
@@ -48,6 +49,7 @@ class ShopEndpoint {
 						'sanitize_callback' => 'sanitize_text_field',
 					],
 					'product_page_id'         => [ 'required' => false, 'type' => 'integer' ],
+					'placeholder_image_id'    => [ 'required' => false, 'type' => 'integer' ],
 				],
 			],
 		] );
@@ -57,6 +59,7 @@ class ShopEndpoint {
 		$pages = get_pages( [ 'post_status' => 'publish', 'sort_column' => 'post_title' ] );
 
 		return new WP_REST_Response( Options::get_shop_settings() + [
+			'placeholder_image_url' => ProductImage::placeholder(),
 			'available_pages' => array_map(
 				fn( $page ) => [
 					'id'              => $page->ID,
@@ -111,6 +114,15 @@ class ShopEndpoint {
 				return new WP_REST_Response( [ 'message' => __( 'Product page must be a page.', 'wordpify' ) ], 400 );
 			}
 			$current['product_page_id'] = $product_page_id;
+		}
+
+		$placeholder_image_id = $request->get_param( 'placeholder_image_id' );
+		if ( $placeholder_image_id !== null ) {
+			$placeholder_image_id = (int) $placeholder_image_id;
+			if ( $placeholder_image_id !== 0 && ! wp_attachment_is_image( $placeholder_image_id ) ) {
+				return new WP_REST_Response( [ 'message' => __( 'Placeholder must be an image from the Media Library.', 'wordpify' ) ], 400 );
+			}
+			$current['placeholder_image_id'] = $placeholder_image_id;
 		}
 
 		update_option( Options::SHOP_SETTINGS, $current );

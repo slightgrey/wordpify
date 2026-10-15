@@ -179,7 +179,7 @@
     if (!productModal.hidden) showModal(); // opened server-side from ?item=
 
     document.addEventListener('click', (e) => {
-      const link = e.target.closest('.wordpify-product-card__link, .wordpify-view-product');
+      const link = e.target.closest('.wordpify-product-card__link, .wordpify-view-product, .wordpify-product-link');
       if (!link || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
 
       const url    = new URL(link.href, location.href);
@@ -187,7 +187,8 @@
       if (!handle || url.pathname !== location.pathname) return; // product page is elsewhere
 
       e.preventDefault();
-      returnFocus = link;
+      // Keep the grid link to return to when navigating between products inside the popup.
+      if (productModal.hidden) returnFocus = link;
       history.pushState({ wordpifyItem: handle }, '', url);
       loadProduct(handle);
     });

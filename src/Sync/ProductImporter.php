@@ -115,6 +115,7 @@ class ProductImporter {
 				'product_title' => sanitize_text_field( $variant['product']['title'] ?? '' ),
 				'variant_title' => sanitize_text_field( $variant['title'] ?? '' ),
 				'handle'        => sanitize_text_field( $variant['product']['handle'] ?? '' ),
+				'image'         => esc_url_raw( $variant['image']['url'] ?? $variant['product']['featuredImage']['url'] ?? '' ),
 				'quantity'      => (int) ( $c['quantity'] ?? 1 ),
 			];
 		}

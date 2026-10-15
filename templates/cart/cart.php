@@ -35,9 +35,7 @@ $shop = (array) get_option( 'wordpify_shop_settings', [] ) + [
 			$image   = $merch['image'] ?? [];
 		?>
 		<div class="wordpify-cart-item" data-line-id="<?php echo esc_attr( $line['id'] ); ?>">
-			<?php if ( ! empty( $image['url'] ) ) : ?>
-			<img src="<?php echo esc_url( $image['url'] ); ?>" alt="<?php echo esc_attr( $product['title'] ?? '' ); ?>" />
-			<?php endif; ?>
+			<img src="<?php echo esc_url( \Wordpify\Frontend\ProductImage::or_placeholder( $image['url'] ?? '' ) ); ?>" alt="<?php echo esc_attr( $product['title'] ?? '' ); ?>" />
 			<div class="wordpify-cart-item__details">
 				<p class="wordpify-cart-item__name"><?php echo esc_html( $product['title'] ?? '' ); ?></p>
 				<?php $variant_title = $merch['title'] ?? ''; ?>

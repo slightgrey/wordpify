@@ -40,6 +40,9 @@ class AdminPage {
 			return;
 		}
 
+		// Media Library modal for the Shop settings placeholder image picker.
+		wp_enqueue_media();
+
 		wp_enqueue_script(
 			self::ASSET_HANDLE,
 			WORDPIFY_URL . 'dist/admin/wordpify-admin.js',

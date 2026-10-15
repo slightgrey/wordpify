@@ -8,10 +8,13 @@
  * @var bool    $show_title
  */
 defined( 'ABSPATH' ) || exit;
-$first_image = $images[0] ?? '';
+
+use Wordpify\Frontend\ProductImage;
+use Wordpify\Frontend\ProductLink;
+
+$first_image = ProductImage::or_placeholder( $images[0] ?? '' );
 ?>
 <div class="wordpify-product-single" id="wordpify-product-<?php echo esc_attr( $product->ID ); ?>">
-	<?php if ( $first_image ) : ?>
 	<div class="wordpify-product-single__gallery">
 		<div class="wordpify-product-single__main-image">
 			<img src="<?php echo esc_url( $first_image ); ?>" alt="<?php echo esc_attr( $product->post_title ); ?>" />
@@ -26,7 +29,6 @@ $first_image = $images[0] ?? '';
 		</div>
 		<?php endif; ?>
 	</div>
-	<?php endif; ?>
 	<div class="wordpify-product-single__info">
 		<?php if ( $show_title ) : ?>
 		<h2 class="wordpify-product-single__title"><?php echo esc_html( $product->post_title ); ?></h2>
@@ -46,15 +48,23 @@ $first_image = $images[0] ?? '';
 		<div class="wordpify-product-single__bundle">
 			<h3 class="wordpify-product-single__bundle-title"><?php esc_html_e( "What's included", 'wordpify' ); ?></h3>
 			<ul class="wordpify-product-single__bundle-items">
-				<?php foreach ( $variants[0]['components'] as $component ) : ?>
-				<li>
-					<?php
+				<?php foreach ( $variants[0]['components'] as $component ) :
 					$c_title = $component['product_title'];
 					if ( ! empty( $component['variant_title'] ) && $component['variant_title'] !== 'Default Title' ) {
 						$c_title .= ' — ' . $component['variant_title'];
 					}
-					echo esc_html( (int) $component['quantity'] . ' × ' . $c_title );
-					?>
+					// Link only to items that are synced and enabled here.
+					$c_url = ProductLink::find_by_handle( (string) ( $component['handle'] ?? '' ) )
+						? ProductLink::url( (string) $component['handle'] )
+						: '';
+					$c_tag = $c_url ? 'a' : 'div';
+				?>
+				<li>
+					<<?php echo $c_tag; ?> class="wordpify-bundle-item<?php echo $c_url ? ' wordpify-product-link' : ''; ?>"<?php echo $c_url ? ' href="' . esc_url( $c_url ) . '"' : ''; ?>>
+						<img class="wordpify-bundle-item__image" src="<?php echo esc_url( ProductImage::or_placeholder( $component['image'] ?? '' ) ); ?>" alt="" loading="lazy" />
+						<span class="wordpify-bundle-item__name"><?php echo esc_html( $c_title ); ?></span>
+						<span class="wordpify-bundle-item__qty">&times; <?php echo esc_html( (string) (int) $component['quantity'] ); ?></span>
+					</<?php echo $c_tag; ?>>
 				</li>
 				<?php endforeach; ?>
 			</ul>

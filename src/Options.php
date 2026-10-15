@@ -45,6 +45,7 @@ class Options {
 			'checkout_notice_enabled' => true,
 			'checkout_notice'         => 'Shipping calculated at checkout',
 			'product_page_id'         => 0,
+			'placeholder_image_id'    => 0,
 		];
 	}
 

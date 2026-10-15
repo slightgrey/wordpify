@@ -26,7 +26,8 @@ $shop = (array) get_option( 'wordpify_shop_settings', [] ) + [
 		$variants = json_decode( get_post_meta( $product->ID, '_wordpify_variants', true ) ?: '[]', true );
 		$handle   = get_post_meta( $product->ID, '_wordpify_handle', true );
 		$url      = \Wordpify\Frontend\ProductLink::url( (string) $handle );
-		$image    = $images[0] ?? '';
+		$image    = \Wordpify\Frontend\ProductImage::or_placeholder( $images[0] ?? '' );
+
 		// Formatted description (clamped to a few lines in CSS). Bundles without one list what's included.
 		$description = trim( wp_strip_all_tags( $product->post_content ) ) !== '' ? wp_kses_post( $product->post_content ) : '';
 		$components  = $description === '' ? ( $variants[0]['components'] ?? [] ) : [];

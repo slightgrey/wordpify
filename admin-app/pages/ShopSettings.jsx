@@ -45,6 +45,32 @@ export default function ShopSettings() {
 
   const selectedPage = (data?.available_pages ?? []).find((p) => p.id === form.product_page_id);
 
+  // WordPress Media Library modal (wp_enqueue_media() in AdminPage).
+  const handleChoosePlaceholder = () => {
+    const frame = window.wp?.media?.({
+      title: 'Choose placeholder image',
+      button: { text: 'Use this image' },
+      library: { type: 'image' },
+      multiple: false,
+    });
+    if (!frame) return;
+
+    frame.on('select', () => {
+      const attachment = frame.state().get('selection').first().toJSON();
+      setForm((prev) => ({
+        ...prev,
+        placeholder_image_id: attachment.id,
+        placeholder_image_url: attachment.sizes?.large?.url ?? attachment.url,
+      }));
+      save.mutate({ placeholder_image_id: attachment.id });
+    });
+    frame.open();
+  };
+
+  const handleResetPlaceholder = () => {
+    save.mutate({ placeholder_image_id: 0 });
+  };
+
   if (isLoading) return <div className="p-6 text-muted-foreground">Loading…</div>;
 
   return (
@@ -82,6 +108,34 @@ export default function ShopSettings() {
               so product links will open it without showing the product. Pick a separate page that does — not your shop/grid page.
             </p>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Placeholder Image</CardTitle>
+          <CardDescription>
+            Shown for products, bundle items and cart lines that have no image in Shopify — e.g. your logo.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center gap-4">
+          {form.placeholder_image_url && (
+            <img
+              src={form.placeholder_image_url}
+              alt="Placeholder preview"
+              className="h-20 w-20 rounded border bg-muted object-contain"
+            />
+          )}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleChoosePlaceholder} disabled={save.isPending}>
+              Choose image
+            </Button>
+            {form.placeholder_image_id > 0 && (
+              <Button variant="ghost" onClick={handleResetPlaceholder} disabled={save.isPending}>
+                Use default
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
 

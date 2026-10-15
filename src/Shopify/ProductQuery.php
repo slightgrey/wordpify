@@ -69,9 +69,15 @@ class ProductQuery {
 							productVariant {
 								id
 								title
+								image {
+									url
+								}
 								product {
 									title
 									handle
+									featuredImage {
+										url
+									}
 								}
 							}
 						}
