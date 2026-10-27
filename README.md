@@ -6,6 +6,28 @@ Wordpify connects a WordPress site to a Shopify store through the **Shopify Stor
 - **Works with:** any theme. Every shortcode also has an Elementor widget.
 - **Version:** 1.4.0
 
+![Wordpify admin dashboard](screenshots/dashboard.png)
+
+## Screenshots
+
+> These screenshots use demo data: the store, product names, images and prices are placeholders.
+
+### Storefront
+
+| Product grid | Product page |
+|---|---|
+| ![Product grid](screenshots/storefront-grid.png) | ![Product page](screenshots/storefront-product.png) |
+
+### Admin
+
+| Synced products | Connection |
+|---|---|
+| ![Synced products with enable switches and reorder](screenshots/products.png) | ![Connection settings](screenshots/connection.png) |
+
+| Shop settings | Shortcode reference |
+|---|---|
+| ![Shop settings](screenshots/shop-settings.png) | ![Shortcode reference](screenshots/shortcodes.png) |
+
 ## Features
 
 ### Product sync
